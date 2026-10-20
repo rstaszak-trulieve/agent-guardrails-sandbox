@@ -1,0 +1,33 @@
+name: dev-gate
+on:
+  pull_request:
+    branches: [dev, main]
+permissions:
+  contents: read
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit + acceptance tests with coverage floor
+        run: >
+          node --test --experimental-test-coverage
+          --test-coverage-lines=90 --test-coverage-branches=80 --test-coverage-functions=90
+          --test-coverage-include='src/**'
+          'tests/**/*.test.js'
+  test-integrity:
+    name: test-integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests were not weakened
+        run: node scripts/test-integrity.mjs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" "${{ github.event.pull_request.user.login }}"

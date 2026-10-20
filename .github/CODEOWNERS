@@ -1,2 +1,5 @@
 # Humans only. Agent identities are never code owners.
 * @rstaszak-trulieve
+/tests/acceptance/ @rstaszak-trulieve
+/.github/ @rstaszak-trulieve
+/scripts/test-integrity.mjs @rstaszak-trulieve
