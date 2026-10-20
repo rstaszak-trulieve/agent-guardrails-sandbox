@@ -31,3 +31,17 @@ jobs:
           node-version: 22
       - name: Tests were not weakened
         run: node scripts/test-integrity.mjs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" "${{ github.event.pull_request.user.login }}"
+  mutation:
+    name: mutation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests catch deliberate bugs in changed code
+        env:
+          MIN_SCORE: "0.8"
+        run: node scripts/mutation-check.mjs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"

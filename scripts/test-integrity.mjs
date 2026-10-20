@@ -1,6 +1,12 @@
 // Test-integrity gate: fails the PR if tests were weakened rather than code fixed.
 // Usage: node scripts/test-integrity.mjs <base-sha> <head-sha> <pr-author-login>
+// Env: TEST_PATTERN (default ^tests/.*\.test\.(m?js|ts|tsx)$ ; vitest repos often ^(tests|__tests__|src)/.*\.(test|spec)\.(ts|tsx|js)$)
+//      ACCEPTANCE_DIR (default tests/acceptance/)  SRC_PREFIX (default src/)
 import { execFileSync } from "node:child_process";
+
+const TEST_RE = new RegExp(process.env.TEST_PATTERN || "^tests/.*\\.test\\.(m?js|ts|tsx)$");
+const ACCEPT = process.env.ACCEPTANCE_DIR || "tests/acceptance/";
+const SRC_PREFIX = process.env.SRC_PREFIX || "src/";
 
 const [base, head, author = ""] = process.argv.slice(2);
 const git = (...a) => execFileSync("git", a, { encoding: "utf8" });
@@ -9,10 +15,10 @@ const problems = [];
 
 const changed = git("diff", "--name-status", `${base}...${head}`).trim().split("\n").filter(Boolean)
   .map((l) => { const [s, ...p] = l.split("\t"); return { status: s[0], path: p.at(-1), from: p[0] }; });
-const isTest = (p) => /^tests\/.*\.test\.(m?js|ts)$/.test(p);
+const isTest = (p) => TEST_RE.test(p);
 
 for (const f of changed) {
-  if (f.path.startsWith("tests/acceptance/") || f.from.startsWith("tests/acceptance/")) {
+  if (f.path.startsWith(ACCEPT) || f.from.startsWith(ACCEPT)) {
     if (isBot) problems.push(`acceptance criteria changed by agent: ${f.path} (acceptance tests are human-owned)`);
   }
   if ((f.status === "D" || f.status === "R") && isTest(f.from)) problems.push(`test file removed/renamed: ${f.from}`);
@@ -32,7 +38,7 @@ for (const f of changed.filter((c) => isTest(c.path) && c.status !== "D")) {
   if (/\.(skip|only|todo)\(|\{\s*(skip|only|todo)\s*:/.test(after)) problems.push(`${f.path}: skip/only/todo present`);
 }
 
-const srcChanged = changed.some((c) => c.path.startsWith("src/") && c.status !== "D");
+const srcChanged = changed.some((c) => c.path.startsWith(SRC_PREFIX) && !isTest(c.path) && c.status !== "D");
 const testsTouched = changed.some((c) => isTest(c.path) && c.status !== "D");
 if (srcChanged && !testsTouched) problems.push("source changed without any new or updated unit test");
 

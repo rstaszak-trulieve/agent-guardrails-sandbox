@@ -3,3 +3,4 @@
 /tests/acceptance/ @rstaszak-trulieve
 /.github/ @rstaszak-trulieve
 /scripts/test-integrity.mjs @rstaszak-trulieve
+/scripts/mutation-check.mjs @rstaszak-trulieve
