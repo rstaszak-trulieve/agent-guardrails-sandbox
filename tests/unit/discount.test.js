@@ -13,3 +13,4 @@ test("rejects non-number price", () => {
 test("zero price stays zero", () => {
   assert.equal(applyDiscount(0, "gold"), 0);
 });
+test("gold is 15%", () => { assert.equal(applyDiscount(100, "gold"), 85); });
