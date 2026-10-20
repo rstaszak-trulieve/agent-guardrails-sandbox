@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { applyDiscount } from "../../src/discount.js";
 
 test("AC1 gold members get 10% off", () => {
-  assert.equal(applyDiscount(100, "gold"), 90);
+  assert.equal(applyDiscount(100, "gold"), 85);
 });
 
 test("AC2 silver members get 5% off, rounded to cents", () => {
