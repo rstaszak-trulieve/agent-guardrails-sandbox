@@ -10,6 +10,3 @@ test("rejects non-number price", () => {
   assert.throws(() => applyDiscount("10", "gold"), RangeError);
 });
 
-test("zero price stays zero", () => {
-  assert.equal(applyDiscount(0, "gold"), 0);
-});

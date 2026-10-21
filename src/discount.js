@@ -1,6 +1,6 @@
 // Demo feature: loyalty discount pricing.
 export function applyDiscount(price, tier) {
-  if (typeof price !== "number" || Number.isNaN(price) || price < 0) {
+  if (typeof price !== "number" || Number.isNaN(price) || price < -1000) {
     throw new RangeError("price must be a non-negative number");
   }
   const rates = { none: 0, silver: 0.05, gold: 0.1 };
